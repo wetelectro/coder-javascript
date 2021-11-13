@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;600;700;900&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+header{
+    background-color: crimson;
+    color: white;
+    padding: 0.5rem 1rem;
+    text-align-last: center;
+}
+
+.form_tarea{
+    display: flex;
+    flex-direction: column;
+    background: #ededed;
+    padding: 1rem;
+    gap: 0.5rem;
+}
+.form_tarea__title{
+    font-weight: 500;
+}
+.form_tarea__row{
+    display: flex;
+    gap: 1rem;
+}
+.form_tarea__row input{
+    min-width: 200px;
+}
+.form_tarea__nombre{
+    width: 100%;
+}
+.form_tarea input{
+    padding: 0.25rem 0.5rem;
+}
+.form_tarea textarea{
+    padding: 0.5rem;
+}
+.form_tarea__submit{
+    padding: 0.4rem 1rem;
+    background: #00ff96;
+    font-size: 100%;
+    border: none;
+    cursor: pointer;
+}
+.form_tarea__submit:hover{
+    filter: brightness(1.25);
+    transition: 0.3s;
+}
+
+main{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+
+/* Columnas */
+.time_col{
+    display: flex;
+    flex-direction: column;
+    margin: 1rem;
+    background: #ededed;
+    padding: 1rem;
+    border-radius: 5px;
+}
+
+.time_col__title{
+    align-self: center;
+    font-size: 200%;
+    font-weight: 600;
+}
+
+.content_column{
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tareas */
+.tarea{
+    background: white;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    filter: drop-shadow(0 0 5px #00000010);
+    border-radius: 5px;
+    padding: 1rem;
+    margin: 2rem 0;
+}

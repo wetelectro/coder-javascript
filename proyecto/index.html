@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <header>
+        <h1>Organizer</h1>
+        <p>Ayudandote a cumplir tus tareas en tiempo y forma</p>
+    </header>
+    
+    <form id="form_tarea" class="form_tarea" action="">
+        <h2 class="form_tarea__title">Crear Tarea</h2>
+        <div class="form_tarea__row">
+            <input class="form_tarea__nombre" type="text" id="nombre_input" placeholder="Nombre de la tarea">
+            <input class="form_tarea__hora" type="time" name="hora" id="hora_input">
+            <input class="form_tarea__fecha" type="date" name="fecha" id="fecha_input">
+        </div>
+        <textarea name="informacion" id="info_input" rows="7" placeholder="Informacion sobre la tarea..."></textarea>
+        <input id="crear_tarea_btn" class="form_tarea__submit" type="submit" value="Agregar Tarea">
+    </form>
+    
+    <main>
+        <div id="today_column" class="time_col today_col">
+            <h2 class="time_col__title">Hoy</h2>
+            <div id="today_column_content" class="content_column"></div>
+        </div>
+        <div id="weekly_column" class="time_col week_col">
+            <h2 class="time_col__title">Esta Semana</h2>
+            <div id="weekly_column_content" class="content_column"></div>
+        </div>
+        <div id="monthly_column" class="time_col month_col">
+            <h2 class="time_col__title">Este Mes</h2>
+            <div id="monthly_column_content" class="content_column"></div>
+        </div>
+    </main>
+    
+    <script src="./app.js"></script>
+</body>
+</html>
