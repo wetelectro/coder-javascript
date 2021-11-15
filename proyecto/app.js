@@ -2,6 +2,9 @@
 main();
 
 function main(){
+    /* Inicializo el array de tareas */
+    let arrayTareas = [];
+
     auth();
 }
 
@@ -32,8 +35,6 @@ function calcularTiempoFinal(fecha, hora){
 }
 
 /* Tareas */
-let arrayTareas = [];
-
 const estados = ["espera","haciendo","terminado"];
 
 function crearTarea(nombre, info, fecha, hora){
@@ -203,8 +204,10 @@ function guardarTareas(){
     localStorage.setItem("tareas-guardadas", JSON.stringify(arrayTareas));
 }
 function cargarTareas(){
-    arrayTareas = JSON.parse(localStorage.getItem("tareas-guardadas"));
-    actualizarColumnas();
+    if(JSON.parse(localStorage.getItem("tareas-guardadas")) != null){
+        arrayTareas = JSON.parse(localStorage.getItem("tareas-guardadas"));
+        actualizarColumnas();
+    }
 }
 
 window.addEventListener("beforeunload", guardarTareas);
