@@ -1,10 +1,10 @@
 /* Proceso Principal */
 main();
 
-function main(){
-    /* Inicializo el array de tareas */
-    let arrayTareas = [];
+/* Inicializo el array de tareas */
+let arrayTareas = [];
 
+function main(){
     auth();
 }
 
