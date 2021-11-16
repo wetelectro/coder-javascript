@@ -25,19 +25,28 @@
     </form>
     
     <main>
-        <div id="today_column" class="time_col today_col">
-            <h2 class="time_col__title">Hoy</h2>
-            <div id="today_column_content" class="content_column"></div>
+        <div class="columns_block">
+            <div id="today_column" class="time_col today_col">
+                <h2 class="time_col__title">Hoy</h2>
+                <div id="today_column_content" class="content_column"></div>
+            </div>
+            <div id="weekly_column" class="time_col week_col">
+                <h2 class="time_col__title">Esta Semana</h2>
+                <div id="weekly_column_content" class="content_column"></div>
+            </div>
+            <div id="monthly_column" class="time_col month_col">
+                <h2 class="time_col__title">Este Mes</h2>
+                <div id="monthly_column_content" class="content_column"></div>
+            </div>
         </div>
-        <div id="weekly_column" class="time_col week_col">
-            <h2 class="time_col__title">Esta Semana</h2>
-            <div id="weekly_column_content" class="content_column"></div>
-        </div>
-        <div id="monthly_column" class="time_col month_col">
-            <h2 class="time_col__title">Este Mes</h2>
-            <div id="monthly_column_content" class="content_column"></div>
+        <div class="delete_block">
+            <button id="borrar_todo" class="btn_borrar_todo">Eliminar todas las Tareas</button>
         </div>
     </main>
+
+    <footer>
+        <p>Made by Agustin Wet</p>
+    </footer>
     
     <script defer src="./app.js"></script>
 </body>

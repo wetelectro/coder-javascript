@@ -23,7 +23,7 @@ function auth(){
 function calcularTiempoFinal(fecha, hora){
     const [year, month, day] = fecha.split("-");
     const [hour, minute] = hora.split(":");
-    
+
     const tiempoFinal = new Date();
     tiempoFinal.setFullYear(year);
     tiempoFinal.setMonth(month - 1);
@@ -35,18 +35,54 @@ function calcularTiempoFinal(fecha, hora){
 }
 
 /* Tareas */
-const estados = ["espera","haciendo","terminado"];
+class Tareas{
+    /* Array principal */
+    static arrayTareas;
+    /* Manipulacion del array */
+    static agregarTarea(tarea){
+        Tareas.arrayTareas.push(tarea);
+    }
+    static borrarTarea(id){
+        Tareas.arrayTareas.forEach((tarea, index) => {
+            if(tarea.id == id){
+                Tareas.arrayTareas.splice(index,1)
+                console.log(Tareas.arrayTareas);
+            }
+        });
+    }
+    static borrarTodasLasTareas(){
+        Tareas.arrayTareas = [];
+    }
 
-function crearTarea(nombre, info, fecha, hora){
-    const ahora = new Date();
-    const tiempoFinal = calcularTiempoFinal(fecha, hora);
-    /* Modelo de Tarea */
-    return {
-        nombre: nombre,
-        info: info,
-        inicio: ahora,
-        fin: tiempoFinal,
-        estado: estados[0]
+    /* Tareas */
+    static crearTarea(nombre, info, fecha, hora){
+        const ahora = new Date();
+        const tiempoFinal = calcularTiempoFinal(fecha, hora);
+        /* Modelo de Tarea */
+        const tarea = {
+            id: ahora.getTime().toString(),
+            nombre: nombre,
+            info: info,
+            inicio: ahora,
+            fin: tiempoFinal,
+            enProgreso: false,
+            finalizado: false,
+            vencido: false
+        };
+        return tarea;
+    }
+
+    /* Guardado y Carga de Tareas */
+    static guardarTareas = () => {
+        localStorage.setItem("tareas-guardadas", JSON.stringify(Tareas.arrayTareas));
+    }
+    static cargarTareas = () => {
+        if(JSON.parse(localStorage.getItem("tareas-guardadas")) != undefined){
+            Tareas.arrayTareas = JSON.parse(localStorage.getItem("tareas-guardadas"));
+        }else{
+            localStorage.setItem("tareas-guardadas", []);
+            Tareas.arrayTareas = [];
+        }
     }
 }
 
@@ -54,6 +90,7 @@ function crearTareaDOM(tarea){
     /* Crear tarea */
     const tareaDiv = document.createElement("div");
     tareaDiv.className = "tarea";
+    tareaDiv.dataset.id = tarea.id;
     /* Crear nombre de tarea */
     const nombreElement = document.createElement("h4");
     nombreElement.innerText = tarea.nombre;
@@ -67,82 +104,137 @@ function crearTareaDOM(tarea){
     const strMinutos = (fechaNormalizada.getMinutes() < 10)? "0"+fechaNormalizada.getMinutes() : fechaNormalizada.getMinutes();
     const strFecha = fechaNormalizada.getDate() +"/"+ fechaNormalizada.getMonth() +"/"+ fechaNormalizada.getFullYear() +" - "+ strHoras +":"+ strMinutos;
     finElement.innerText = strFecha;
+
     /* Crear botones de accion*/
     const buttonsDiv = document.createElement("div");
+    buttonsDiv.className = "tarea__buttons";
+
     const buttonHaciendo = document.createElement("button");
-    buttonHaciendo.innerText = "Empezar";
+    buttonHaciendo.innerText = "Activo";
+    buttonHaciendo.className = "tarea__btn";
+
     const buttonFin = document.createElement("button");
     buttonFin.innerText = "Finalizado";
+    buttonFin.className = "tarea__btn";
+
+    const buttonEliminar = document.createElement("button");
+    buttonEliminar.innerText = "Borrar";
+    buttonEliminar.className = "tarea__btn btn__borrar";
+    buttonEliminar.addEventListener('click', (e) => {
+        console.log(tarea.id);
+        Tareas.borrarTarea(tarea.id);
+    })
 
     /* Unir botones */
     buttonsDiv.appendChild(buttonHaciendo);
     buttonsDiv.appendChild(buttonFin);
+    buttonsDiv.appendChild(buttonEliminar);
     /* Unir todo */
     tareaDiv.appendChild(nombreElement);
     tareaDiv.appendChild(infoElement);
     tareaDiv.appendChild(finElement);
     tareaDiv.appendChild(buttonsDiv);
-    
+
     return tareaDiv;
 }
 
 /* Procesado del Formulario */
-const formTarea = document.getElementById("form_tarea");
-const nombreTarea = document.getElementById("nombre_input");
-const horaTarea = document.getElementById("hora_input");
-const fechaTarea = document.getElementById("fecha_input");
-const infoTarea = document.getElementById("info_input");
-const btnTarea = document.getElementById("crear_tarea_btn");
+class Formulario{
+    /* Almacenamiento de los datos */
+    static valores = { nombre: "", info: "", fecha: "", hora: "" };
+    /* Elementos HTML del formulario */
+    static formTarea = document.getElementById("form_tarea");
+    static nombreTarea = document.getElementById("nombre_input");
+    static horaTarea = document.getElementById("hora_input");
+    static fechaTarea = document.getElementById("fecha_input");
+    static infoTarea = document.getElementById("info_input");
+    static btnTarea = document.getElementById("crear_tarea_btn");
 
-let formValues = { nombre: "", info: "", fecha: "", hora: "" };
+    static actualizarValores(){
+        Formulario.valores.nombre = Formulario.nombreTarea.value;
+        Formulario.valores.info = Formulario.infoTarea.value;
+        Formulario.valores.fecha = Formulario.fechaTarea.value;
+        Formulario.valores.hora = Formulario.horaTarea.value;
+        Formulario.mostrarValores();
+    }
 
-function actualizarValores(){
-    formValues.nombre = nombreTarea.value;
-    formValues.info = infoTarea.value;
-    formValues.fecha = fechaTarea.value;
-    formValues.hora = horaTarea.value;
+    static submit(e){
+        e.preventDefault();
+        Tareas.agregarTarea(Tareas.crearTarea(Formulario.valores.nombre, Formulario.valores.info, Formulario.valores.fecha, Formulario.valores.hora));
+    }
 
-    console.log(JSON.stringify(formValues)); //Mostrar los datos actuales por consola
+    static mostrarValores(){
+        console.log(JSON.stringify(Formulario.valores));
+    }
 }
 
-nombreTarea.addEventListener("input", actualizarValores);
-horaTarea.addEventListener("input", actualizarValores);
-fechaTarea.addEventListener("input", actualizarValores);
-infoTarea.addEventListener("input", actualizarValores);
-
-formTarea.addEventListener("submit", (e) => {
-    e.preventDefault();
-    arrayTareas.push(crearTarea(formValues.nombre, formValues.info, formValues.fecha, formValues.hora));
-    actualizarColumnas();
-})
+Formulario.nombreTarea.addEventListener('input', Formulario.actualizarValores);
+Formulario.horaTarea.addEventListener('input', Formulario.actualizarValores);
+Formulario.fechaTarea.addEventListener('input', Formulario.actualizarValores);
+Formulario.infoTarea.addEventListener('input', Formulario.actualizarValores);
+Formulario.formTarea.addEventListener("submit", Formulario.submit);
 
 /* Columnas de Tareas */
-function actualizarColumnas(){
-    const hoy = new Date();
-    let arrayTareasAuxiliar = [...arrayTareas];
+class Columnas{
+    static columnaHoy = document.getElementById("today_column_content");
+    static columnaSemana = document.getElementById("weekly_column_content");
+    static columnaMes = document.getElementById("monthly_column_content");
 
-    const columnaHoy = document.getElementById("today_column_content");
-    const columnaSemana = document.getElementById("weekly_column_content");
-    const columnaMes = document.getElementById("monthly_column_content");
+    static actualizarColumnas(){
+        const hoy = new Date();
+        let arrayTareasAuxiliar = [...Tareas.arrayTareas];
 
-    columnaHoy.innerHTML = "";
-    columnaSemana.innerHTML = "";
-    columnaMes.innerHTML = "";
+        Columnas.columnaHoy.innerHTML = "";
+        Columnas.columnaSemana.innerHTML = "";
+        Columnas.columnaMes.innerHTML = "";
 
-    /* El orden es importante, debe empezar por dia, luego semana y luego mes */
-    arrayTareasAuxiliar.forEach((tarea, index) => {
-        const fechaTareaDateType = new Date(tarea.fin);
-        if(esTodayColumn(hoy, fechaTareaDateType)){
-            columnaHoy.appendChild(crearTareaDOM(tarea));
-            arrayTareasAuxiliar.splice(index, 1);
-        }else if (esWeekColumn(hoy, fechaTareaDateType)) {
-            columnaSemana.appendChild(crearTareaDOM(tarea));
-            arrayTareasAuxiliar.splice(index, 1);
-        }else if (esMonthColumn(hoy, fechaTareaDateType)) {
-            columnaMes.appendChild(crearTareaDOM(tarea));
-            arrayTareasAuxiliar.splice(index, 1);
-        }
-    });
+        let arrayHoy = [];
+        let arraySemana = [];
+        let arrayMes = [];
+
+        arrayTareasAuxiliar.forEach((tarea) => {
+            const fechaTareaDateType = new Date(tarea.fin);
+            if(esTodayColumn(hoy, fechaTareaDateType)){
+                arrayHoy.push(tarea);
+            }
+            if(esWeekColumn(hoy, fechaTareaDateType)){
+                arraySemana.push(tarea);
+            }
+            if(esMonthColumn(hoy, fechaTareaDateType)){
+                arrayMes.push(tarea);
+            }
+        });
+
+        arrayHoy = Columnas.ordenarPorFecha(arrayHoy);
+        arraySemana = Columnas.ordenarPorFecha(arraySemana);
+        arrayMes = Columnas.ordenarPorFecha(arrayMes);
+
+        Columnas.renderHoyCol(arrayHoy);
+        Columnas.renderWeekCol(arraySemana);
+        Columnas.renderMonthCol(arrayMes);
+    }
+
+    static ordenarPorFecha = (array) => {
+        return array.sort((a,b) => {
+            return new Date(a.fin).getTime() - new Date(b.fin).getTime();
+        });
+    }
+
+    static renderHoyCol = (col) => {
+        col.forEach((tarea) => {
+            Columnas.columnaHoy.appendChild(crearTareaDOM(tarea));
+        });
+    }
+    static renderWeekCol = (col) => {
+        col.forEach((tarea) => {
+            Columnas.columnaSemana.appendChild(crearTareaDOM(tarea));
+        });
+    }
+    static renderMonthCol = (col) => {
+        col.forEach((tarea) => {
+            Columnas.columnaMes.appendChild(crearTareaDOM(tarea));
+        });
+    }
 }
 
 /* Funciones para Elegir Columna */
@@ -153,17 +245,15 @@ function esTodayColumn(hoy, fin){
         return false;
     }
 }
-function esWeekColumn(hoy, fin){ 
-    if( esMismoMes(hoy, fin) && esMismoAnio(hoy, fin) && esMismaSemana(hoy, fin) ){
-        console.log("misma semana");
+function esWeekColumn(hoy, fin){
+    if( !esMismoDia(hoy, fin) && esMismoMes(hoy, fin) && esMismoAnio(hoy, fin) && esMismaSemana(hoy, fin) ){
         return true;
     }else{
-        console.log("diferente semana");
         return false;
     }
 }
 function esMonthColumn(hoy, fin){
-    if( esMismoMes(hoy, fin) && esMismoAnio(hoy, fin) ){
+    if( !esMismoDia(hoy, fin) && !esMismaSemana(hoy, fin) && esMismoMes(hoy, fin) && esMismoAnio(hoy, fin) ){
         return true;
     }else{
         return false;
@@ -172,7 +262,6 @@ function esMonthColumn(hoy, fin){
 
 /* Funciones de Comparacion de Fechas */
 function esMismoDia(fecha1, fecha2){
-    console.log(fecha1 + " ::: " + fecha2);
     if(fecha1.getDate() === fecha2.getDate()){
         return true;
     }
@@ -199,18 +288,13 @@ function esMismoAnio(fecha1, fecha2){
     return false;
 }
 
-/* Guardado y Carga de Tareas */
-function guardarTareas(){
-    localStorage.setItem("tareas-guardadas", JSON.stringify(arrayTareas));
-}
-function cargarTareas(){
-    if(JSON.parse(localStorage.getItem("tareas-guardadas")) != null){
-        arrayTareas = JSON.parse(localStorage.getItem("tareas-guardadas"));
-        actualizarColumnas();
-    }else{
-        localStorage.setItem("tareas-guardadas", []);
-    }
-}
+setInterval(() => {
+    Columnas.actualizarColumnas();
+}, 250);
 
-window.addEventListener("beforeunload", guardarTareas);
-window.addEventListener("load", cargarTareas);
+document.getElementById('borrar_todo').addEventListener('click', () => {
+    Tareas.borrarTodasLasTareas();
+});
+
+window.addEventListener("beforeunload", Tareas.guardarTareas);
+window.addEventListener("load", Tareas.cargarTareas);

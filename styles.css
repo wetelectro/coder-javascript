@@ -8,6 +8,9 @@
 
 body{
     font-family: 'Source Sans Pro', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 header{
@@ -56,12 +59,15 @@ header{
 }
 
 main{
+    display: flex;
+    flex-direction: column;
+}
+
+/* Columnas */
+.columns_block{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
 }
-
-
-/* Columnas */
 .time_col{
     display: flex;
     flex-direction: column;
@@ -92,4 +98,45 @@ main{
     border-radius: 5px;
     padding: 1rem;
     margin: 2rem 0;
+}
+.tarea__buttons{
+    display: flex;
+    gap: 0.5rem;
+}
+.tarea__btn{
+    width: 100%;
+    padding: 0.25rem;
+    border: none;
+    cursor: pointer;
+}
+.tarea__btn:hover{
+    filter: brightness(0.9);
+}
+.btn__borrar{
+    background-color: rgb(206, 43, 32);
+    color: white;
+}
+
+.delete_block{
+    display: flex;
+    padding: 1rem;
+}
+.btn_borrar_todo{
+    width: 100%;
+    padding: 0.25rem;
+    border: solid 1px #e0e0e0;
+    cursor: pointer;
+    background-color: #eeeeee;
+    color: rgb(206, 43, 32);
+}
+.btn_borrar_todo:hover{
+    filter: brightness(0.9);
+}
+
+footer{
+    background-color: crimson;
+    color: white;
+    padding: 2.5rem 1rem;
+    text-align-last: center;
+    margin: auto 0 0 0;
 }
