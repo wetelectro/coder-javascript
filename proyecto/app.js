@@ -207,6 +207,8 @@ function cargarTareas(){
     if(JSON.parse(localStorage.getItem("tareas-guardadas")) != null){
         arrayTareas = JSON.parse(localStorage.getItem("tareas-guardadas"));
         actualizarColumnas();
+    }else{
+        localStorage.setItem("tareas-guardadas", []);
     }
 }
 
