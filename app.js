@@ -1,9 +1,6 @@
 /* Proceso Principal */
 main();
 
-/* Inicializo el array de tareas */
-let arrayTareas = [];
-
 function main(){
     auth();
 }
@@ -37,21 +34,40 @@ function calcularTiempoFinal(fecha, hora){
 /* Tareas */
 class Tareas{
     /* Array principal */
-    static arrayTareas;
+    static arrayTareas = [];
     /* Manipulacion del array */
     static agregarTarea(tarea){
         Tareas.arrayTareas.push(tarea);
+        Columnas.actualizarColumnas();
     }
     static borrarTarea(id){
         Tareas.arrayTareas.forEach((tarea, index) => {
             if(tarea.id == id){
                 Tareas.arrayTareas.splice(index,1)
-                console.log(Tareas.arrayTareas);
+                Columnas.actualizarColumnas();
             }
         });
     }
     static borrarTodasLasTareas(){
         Tareas.arrayTareas = [];
+        Columnas.actualizarColumnas();
+    }
+    static finalizarTarea(id){
+        Tareas.arrayTareas.forEach((tarea, index) => {
+            if(tarea.id == id){
+                tarea.finalizado = true;
+                tarea.enProgreso = false;
+                Columnas.actualizarColumnas();
+            }
+        });
+    }
+    static switchProgreso(id){
+        Tareas.arrayTareas.forEach((tarea, index) => {
+            if(tarea.id == id){
+                tarea.enProgreso = !tarea.enProgreso;
+                Columnas.actualizarColumnas();
+            }
+        });
     }
 
     /* Tareas */
@@ -74,11 +90,18 @@ class Tareas{
 
     /* Guardado y Carga de Tareas */
     static guardarTareas = () => {
-        localStorage.setItem("tareas-guardadas", JSON.stringify(Tareas.arrayTareas));
+        if(Tareas.arrayTareas){
+            localStorage.setItem("tareas-guardadas", JSON.stringify(Tareas.arrayTareas));
+            Columnas.actualizarColumnas();
+        }else{
+            localStorage.setItem("tareas-guardadas", []);
+        }
+        
     }
     static cargarTareas = () => {
         if(JSON.parse(localStorage.getItem("tareas-guardadas")) != undefined){
             Tareas.arrayTareas = JSON.parse(localStorage.getItem("tareas-guardadas"));
+            Columnas.actualizarColumnas();
         }else{
             localStorage.setItem("tareas-guardadas", []);
             Tareas.arrayTareas = [];
@@ -91,6 +114,7 @@ function crearTareaDOM(tarea){
     const tareaDiv = document.createElement("div");
     tareaDiv.className = "tarea";
     tareaDiv.dataset.id = tarea.id;
+    tareaDiv.id = tarea.id;
     /* Crear nombre de tarea */
     const nombreElement = document.createElement("h4");
     nombreElement.innerText = tarea.nombre;
@@ -110,20 +134,38 @@ function crearTareaDOM(tarea){
     buttonsDiv.className = "tarea__buttons";
 
     const buttonHaciendo = document.createElement("button");
-    buttonHaciendo.innerText = "Activo";
+    buttonHaciendo.innerText = "Empezar";
     buttonHaciendo.className = "tarea__btn";
+    buttonHaciendo.addEventListener('click', () => {
+        Tareas.switchProgreso(tarea.id);
+    });
 
     const buttonFin = document.createElement("button");
     buttonFin.innerText = "Finalizado";
     buttonFin.className = "tarea__btn";
+    buttonFin.addEventListener('click', () => {
+        Tareas.finalizarTarea(tarea.id);
+    });
 
     const buttonEliminar = document.createElement("button");
     buttonEliminar.innerText = "Borrar";
     buttonEliminar.className = "tarea__btn btn__borrar";
     buttonEliminar.addEventListener('click', (e) => {
-        console.log(tarea.id);
         Tareas.borrarTarea(tarea.id);
     })
+
+    /* Tarea Finalizada */
+    if(tarea.finalizado){
+        tareaDiv.classList.add('tarea--finalizada');
+        buttonEliminar.classList.add('tarea__btn--desactivate');
+        buttonHaciendo.classList.add('tarea__btn--desactivate');
+    }
+
+    /* Tarea En Progreso */
+    if(tarea.enProgreso){
+        tareaDiv.classList.add('tarea--on_progress');
+        buttonHaciendo.innerText = "Pausar";
+    }
 
     /* Unir botones */
     buttonsDiv.appendChild(buttonHaciendo);
@@ -181,41 +223,49 @@ class Columnas{
     static columnaMes = document.getElementById("monthly_column_content");
 
     static actualizarColumnas(){
-        const hoy = new Date();
-        let arrayTareasAuxiliar = [...Tareas.arrayTareas];
+        if(Tareas.arrayTareas != undefined){
+            const hoy = new Date();
+            let arrayTareasAuxiliar = [...Tareas.arrayTareas];
 
-        Columnas.columnaHoy.innerHTML = "";
-        Columnas.columnaSemana.innerHTML = "";
-        Columnas.columnaMes.innerHTML = "";
+            Columnas.columnaHoy.innerHTML = "";
+            Columnas.columnaSemana.innerHTML = "";
+            Columnas.columnaMes.innerHTML = "";
 
-        let arrayHoy = [];
-        let arraySemana = [];
-        let arrayMes = [];
+            let arrayHoy = [];
+            let arraySemana = [];
+            let arrayMes = [];
 
-        arrayTareasAuxiliar.forEach((tarea) => {
-            const fechaTareaDateType = new Date(tarea.fin);
-            if(esTodayColumn(hoy, fechaTareaDateType)){
-                arrayHoy.push(tarea);
-            }
-            if(esWeekColumn(hoy, fechaTareaDateType)){
-                arraySemana.push(tarea);
-            }
-            if(esMonthColumn(hoy, fechaTareaDateType)){
-                arrayMes.push(tarea);
-            }
-        });
+            arrayTareasAuxiliar.forEach((tarea) => {
+                const fechaTareaDateType = new Date(tarea.fin);
+                if(esTodayColumn(hoy, fechaTareaDateType)){
+                    arrayHoy.push(tarea);
+                }
+                if(esWeekColumn(hoy, fechaTareaDateType)){
+                    arraySemana.push(tarea);
+                }
+                if(esMonthColumn(hoy, fechaTareaDateType)){
+                    arrayMes.push(tarea);
+                }
+            });
 
-        arrayHoy = Columnas.ordenarPorFecha(arrayHoy);
-        arraySemana = Columnas.ordenarPorFecha(arraySemana);
-        arrayMes = Columnas.ordenarPorFecha(arrayMes);
+            arrayHoy = Columnas.ordenarPorFecha(arrayHoy);
+            arraySemana = Columnas.ordenarPorFecha(arraySemana);
+            arrayMes = Columnas.ordenarPorFecha(arrayMes);
 
-        Columnas.renderHoyCol(arrayHoy);
-        Columnas.renderWeekCol(arraySemana);
-        Columnas.renderMonthCol(arrayMes);
+            Columnas.renderHoyCol(arrayHoy);
+            Columnas.renderWeekCol(arraySemana);
+            Columnas.renderMonthCol(arrayMes);
+        }
     }
 
     static ordenarPorFecha = (array) => {
         return array.sort((a,b) => {
+            if(a.finalizado){
+                return (new Date(a.fin).getTime() * 100) - new Date(b.fin).getTime();
+            }
+            if(b.finalizado){
+                return new Date(a.fin).getTime() - (new Date(b.fin).getTime() * 100);
+            }
             return new Date(a.fin).getTime() - new Date(b.fin).getTime();
         });
     }
@@ -288,13 +338,15 @@ function esMismoAnio(fecha1, fecha2){
     return false;
 }
 
-setInterval(() => {
-    Columnas.actualizarColumnas();
-}, 250);
-
 document.getElementById('borrar_todo').addEventListener('click', () => {
     Tareas.borrarTodasLasTareas();
 });
 
 window.addEventListener("beforeunload", Tareas.guardarTareas);
 window.addEventListener("load", Tareas.cargarTareas);
+
+/* Efectos Jquery */
+$('header').animate({opacity: 1}, 1500);
+$('form').delay(750).animate({opacity: 1}, 1500);
+$('main').delay(1500).animate({opacity: 1}, 1500);
+$('footer').animate({opacity: 1}, 1500);
