@@ -24,10 +24,10 @@ setInterval(() => {
     }).done((res) => { 
         precioBlue = res.blue.value_sell;
         precioOficial = res.oficial.value_sell;
-
+        /* Reemplazar Textos */
         dBlue.innerText = dBlueText + precioBlue;
         dOficial.innerText = dOficialText + precioOficial;
-
+        /* Calcular brecha */
         dBrecha.innerText = brechaText + calcularBrecha(precioOficial, precioBlue);
     });
 
