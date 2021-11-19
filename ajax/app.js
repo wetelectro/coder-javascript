@@ -1,4 +1,4 @@
-const URL = 'https://api-dolar-argentina.herokuapp.com/api/';
+const URL = 'https://api.bluelytics.com.ar/v2/latest';
 
 let precioBlue;
 let precioOficial;
@@ -20,19 +20,15 @@ function calcularBrecha(oficial, blue){
 
 setInterval(() => {
     $.ajax({
-        url: URL + 'dolarblue'
+        url: URL
     }).done((res) => { 
-        precioBlue = res.venta;
-        dBlue.innerText = dBlueText + res.venta;
-    });
+        precioBlue = res.blue.value_sell;
+        precioOficial = res.oficial.value_sell;
 
-    $.ajax({
-        url: URL + 'dolaroficial'
-    }).done((res) => { 
-        precioOficial = res.venta;
-        dOficial.innerText = dOficialText + res.venta;
-    });
+        dBlue.innerText = dBlueText + precioBlue;
+        dOficial.innerText = dOficialText + precioOficial;
 
-    dBrecha.innerText = brechaText + calcularBrecha(precioOficial, precioBlue);
+        dBrecha.innerText = brechaText + calcularBrecha(precioOficial, precioBlue);
+    });
 
 }, 1000);
